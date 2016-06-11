@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 /**
   * Exercises: http://aperiodic.net/phil/scala/s-99/#lists
   *
@@ -5,25 +7,59 @@
   */
 object S99List {
   // P01
-  def last[T](l: List[T]): T = ???
+  @tailrec
+  def last[T](l: List[T]): T = l match {
+    case x :: Nil => x
+    case x :: xs => last(xs)
+    case Nil => throw new NoSuchElementException
+  }
 
   // P02
-  def penultimate[T](l: List[T]): T = ???
+  @tailrec
+  def penultimate[T](l: List[T]): T = l match {
+    case Nil | List(_) => throw new NoSuchElementException
+    case List(x, _) => x
+    case _ => penultimate(l.tail)
+  }
 
   // P03
-  def nth[T](pos: Int, l: List[T]): T = ???
+  @tailrec
+  def nth[T](pos: Int, l: List[T]): T = {
+    require(pos >= 0)
+    if (l.isEmpty) throw new NoSuchElementException
+    pos match {
+      case 0 => l.head
+      case _ => nth(pos - 1, l.tail)
+    }
+  }
 
   // P04
-  def length[T](l: List[T]): Int = ???
+  def length[T](l: List[T]): Int = l.foldLeft(0)((c: Int, _) => c + 1)
+
+  //l.length
 
   // P05
-  def reverse[T](l: List[T]): List[T] = ???
+  def reverse[T](l: List[T]): List[T] = {
+
+    @tailrec
+    def reverseR(acc: List[T], l: List[T]): List[T] = l match {
+      case Nil => acc
+      case x :: xs => reverseR(x :: acc, xs)
+    }
+
+    reverseR(Nil, l)
+  }
 
   // P06
-  def isPalindrome[T](l: List[T]): Boolean = ???
+  def isPalindrome[T](l: List[T]): Boolean = l == reverse(l)
 
   // P07
-  def flatten(l: List[Any]): List[Any] = ???
+  def flatten(l: List[Any]): List[Any] = l match {
+    case Nil => Nil
+    case (x: List[Any]) :: xs => flatten(x) ::: flatten(xs)
+    case (x: Any) :: xs => x :: flatten(xs)
+    case x: Any => List(x)
+  }
 
   // P08
   def compress[T](l: List[T]): List[T] = ???
